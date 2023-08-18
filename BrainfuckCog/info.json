@@ -1,0 +1,11 @@
+{
+  "author": [
+    "T14D3"
+  ],
+  "description": "Simple Brainfuck Interpreter",
+  "hidden": false,
+  "install_msg": "Thank you for using this Cog! To use it, either brainfuck something ([p]brainfuck <Text-input>), or Un-Brainfuck it ([p]unbrainfuck <Brainfuck-input>)!",
+  "short": "Brainfuck",
+  "end_user_data_statement": "This cog does not store end user data.",
+  "min_bot_version": "3.5.0"
+}
