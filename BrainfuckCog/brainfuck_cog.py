@@ -6,7 +6,7 @@ class BrainfuckCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=["bf"])
     async def brainfuck(self, ctx, *, text: str):
         """
         Compiles normal text into Brainfuck code.        """
@@ -16,7 +16,7 @@ class BrainfuckCog(commands.Cog):
         except Exception as e:
             await ctx.send(f"Error: {e}")
 
-    @commands.command()
+    @commands.command(aliases=["ubf"])
     async def unbrainfuck(self, ctx, *, code: str):
         """
         Interprets Brainfuck code and converts it to normal text.        """
