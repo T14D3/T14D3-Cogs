@@ -1,6 +1,6 @@
 {
     "name": "YoutubeApiNotifs",
-    "author": "T14D3",
+    "author": ["T14D3"],
     "version": "1.0.0",
     "hidden": true,
     "description": "A Red-DiscordBot cog to get the link to the newest YouTube video of a channel.",
