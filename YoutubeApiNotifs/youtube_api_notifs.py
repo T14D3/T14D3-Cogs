@@ -1,21 +1,31 @@
 import discord
-from redbot.core import commands
+from redbot.core import commands, Config
 import googleapiclient.discovery
 
 class YoutubeApiNotifs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier="youtube_api_notifs")  # Use a unique identifier
+        default_guild_settings = {
+            "api_key": ""
+        }
+        self.config.register_guild(**default_guild_settings)
+
+    @commands.command()
+    async def setapikey(self, ctx, api_key: str):
+        """Set the YouTube API key for this cog."""
+        await self.config.guild(ctx.guild).api_key.set(api_key)
+        await ctx.send("YouTube API key set successfully!")
 
     @commands.command()
     async def ytquery(self, ctx, channel_id: str):
         """Get the link to the newest video of a channel."""
-        youtube_keys = await self.bot.get_shared_api_tokens("youtube")
-        if youtube_keys.get("api_key") is None:
-            await ctx.send("The YouTube API key has not been set.")
+        api_key = await self.config.guild(ctx.guild).api_key()
+        if not api_key:
+            await ctx.send("The YouTube API key has not been set. Use `[p]setapikey <api_key>` to set it.")
             return
         
-        API_KEY = youtube_keys["api_key"]
-        youtube = googleapiclient.discovery.build('youtube', 'v3', developerKey=API_KEY)
+        youtube = googleapiclient.discovery.build('youtube', 'v3', developerKey=api_key)
 
         try:
             response = youtube.search().list(
