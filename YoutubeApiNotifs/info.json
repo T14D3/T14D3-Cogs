@@ -4,5 +4,6 @@
     "version": "1.0.0",
     "hidden": true,
     "description": "A Red-DiscordBot cog to get the link to the newest YouTube video of a channel.",
-    "tags": ["youtube", "cog"]
+    "tags": ["youtube", "cog"],
+    "requirements": ["google-api-python-client"]
 }
