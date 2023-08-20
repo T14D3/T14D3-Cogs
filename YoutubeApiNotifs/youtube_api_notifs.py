@@ -15,7 +15,8 @@ class YoutubeApiNotifs(commands.Cog):
     async def setapikey(self, ctx, api_key: str):
         """Set the YouTube API key for this cog."""
         await self.config.guild(ctx.guild).api_key.set(api_key)
-        await ctx.send("YouTube API key set successfully!")
+        await ctx.message.delete()
+        await ctx.send("YouTube API key set successfully!", delete_after=5)
 
     @commands.command()
     async def ytquery(self, ctx, channel_id: str):
