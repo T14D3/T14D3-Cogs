@@ -5,7 +5,7 @@ import googleapiclient.discovery
 class YoutubeApiNotifs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier="youtube_api_notifs")  # Use a unique identifier
+        self.config = Config.get_conf(self, identifier="youtube_api_notifs")
         default_guild_settings = {
             "api_key": ""
         }
