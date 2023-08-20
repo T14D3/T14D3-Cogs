@@ -1,7 +1,6 @@
 import discord
 from redbot.core import commands
 import googleapiclient.discovery
-from googleapiclient.errors import HttpError
 
 class YoutubeApiNotifs(commands.Cog):
     def __init__(self, bot):
@@ -11,10 +10,10 @@ class YoutubeApiNotifs(commands.Cog):
     async def ytquery(self, ctx, channel_id: str):
         """Get the link to the newest video of a channel."""
         youtube_keys = await self.bot.get_shared_api_tokens("youtube")
-        if "api_key" not in youtube_keys:
-            await ctx.send("API key for YouTube not set. Use `[p]set api youtube api_key <key>` to set it.")
+        if youtube_keys.get("api_key") is None:
+            await ctx.send("The YouTube API key has not been set.")
             return
-
+        
         API_KEY = youtube_keys["api_key"]
         youtube = googleapiclient.discovery.build('youtube', 'v3', developerKey=API_KEY)
 
@@ -33,7 +32,7 @@ class YoutubeApiNotifs(commands.Cog):
                 await ctx.send(f"Newest Video Link: {video_link}")
             else:
                 await ctx.send("No videos found on the channel.")
-        except HttpError as e:
+        except googleapiclient.errors.HttpError as e:
             if "API key expired" in str(e):
                 await ctx.send("API key for YouTube has expired. Please renew the API key.")
             else:
