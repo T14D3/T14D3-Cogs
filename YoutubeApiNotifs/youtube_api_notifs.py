@@ -35,8 +35,9 @@ class YoutubeApiNotifs(commands.Cog):
                 await ctx.send("No videos found on the channel.")
         except HttpError as e:
             if "API key expired" in str(e):
-                owner = ctx.bot.get_user(ctx.bot.owner_id)
-                await owner.send(f"API key for YouTube has expired. Please renew the API key.")
+                await ctx.send("API key for YouTube has expired. Please renew the API key.")
+            else:
+                await ctx.send("An error occurred while fetching data from the YouTube API.")
 
 def setup(bot):
     bot.add_cog(YoutubeApiNotifs(bot))
