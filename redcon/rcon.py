@@ -6,7 +6,7 @@ from rcon import Client
 
 
 class RedCon(commands.Cog):
-    def __init__(self, bot: Red):
+    def __init__(self, bot):
         super().__init__(bot=bot)
 
         self.tree = app_commands.CommandTree(self)
@@ -30,5 +30,5 @@ async def run_rcon(interaction: discord.Interaction):
 
     
 
-def setup(bot: Red):
+def setup(bot):
     bot.add_cog(RedCon(bot))
