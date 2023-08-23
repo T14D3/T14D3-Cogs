@@ -1,7 +1,6 @@
 import discord
 from discord import app_commands
 from redbot.core import commands, app_commands
-
 from rcon import Client
 
 
@@ -38,9 +37,21 @@ class InputModal(discord.ui.Modal, title='Connection details'):
         placeholder='RCON-Command to execute',
     )
 
-    async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'{self.ip.value} {self.port.value} {self.password.value} {self.command.value}', ephemeral=True)
+    #async def on_submit(self, interaction: discord.Interaction):
+    #    await interaction.response.send_message(f'{self.ip.value} {self.port.value} {self.password.value} {self.command.value}', ephemeral=True)
 
+    async def on_submit(self, interaction: discord.Interaction):
+        ip_value = self.ip.value
+        port_value = int(self.port.value)
+        password_value = self.password.value
+        command_value = self.command.value
+
+        try:
+            with Client(ip_value, port_value, password_value) as client:
+                response = client.execute(command_value)
+            await interaction.response.send_message(f'RCON response:\n```\n{response}\n```', ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
 
     
