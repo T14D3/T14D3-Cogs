@@ -1,0 +1,15 @@
+{
+    "author": [
+      "T14D3"
+    ],
+    "description": "RCON-Client",
+    "hidden": false,
+    "install_msg": "RCON has been loaded.",
+    "short": "RCON",
+    "end_user_data_statement": "This cog does not store end user data.",
+    "min_bot_version": "3.5.0",
+    "requirements": [
+        "discord-py-slash-command",
+        "async-rcon"
+    ]
+  }
