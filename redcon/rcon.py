@@ -7,9 +7,10 @@ from rcon import Client
 
 class RedCon(commands.Cog):
     def __init__(self, bot):
-        super().__init__(bot=bot)
 
-        self.tree = app_commands.CommandTree(self)
+        self.bot = bot
+
+        # self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
         await self.tree.sync()
