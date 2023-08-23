@@ -6,14 +6,16 @@ class RedCon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def rcon(self, ctx):
-        view = RconView()
-        await ctx.send("Please provide RCON details:", view=view, ephemeral=True)
+    @commands.slash_command()
+    async def rcon(self, ctx: discord.ApplicationContext):
+        await ctx.defer()
 
-class RconView(ui.View):
-    def __init__(self):
-        super().__init__()
+        modal = RconModal(title="RCON Command")
+        await ctx.send_modal(modal)
+
+class RconModal(ui.CancellableModal):
+    def __init__(self, title):
+        super().__init__(title=title)
 
         self.ip_input = ui.TextInput(label="Server IP")
         self.port_input = ui.NumberInput(label="Server Port")
@@ -28,12 +30,11 @@ class RconView(ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user == self.ctx.author
 
-    @ui.button(label="Execute RCON Command", style=discord.ButtonStyle.primary)
-    async def execute_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-        ip = self.ip_input.value
-        port = self.port_input.value
-        password = self.password_input.value
-        command = self.command_input.value
+    async def on_confirm(self, interaction: discord.Interaction, values: dict):
+        ip = values['ip_input']
+        port = values['port_input']
+        password = values['password_input']
+        command = values['command_input']
 
         try:
             with Client(ip, port, password) as client:
