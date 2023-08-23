@@ -24,7 +24,7 @@ class InputModal(discord.ui.Modal, title='Connection details'):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(f'Test-Response - {self.input.value}', ephemeral=True)
 
-@client.tree.command(description='TestCMD')
+@app.commands.command()
 async def run_rcon(interaction: discord.Interaction):
     await interaction.response.send_modal(InputModal())
 
