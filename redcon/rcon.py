@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, ui
+import discord.ext
 from rcon import Client
 
 class RedCon(commands.Cog):
