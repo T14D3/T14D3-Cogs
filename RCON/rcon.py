@@ -4,7 +4,7 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from rcon import Client
 
-class RconCog(commands.Cog):
+class RedCon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
