@@ -1,27 +1,30 @@
 import discord
-from discord.ext import commands
-from discord import ui
+from redbot.core import commands, app_commands
+from redbot.core.commands.context import ApplicationContext
+from redbot.core.bot import Red
+from redbot.core.ui import TextInput, NumberInput, CancellableModal
+
 from rcon import Client
-
 class RedCon(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
+        self.tree = app_commands.CommandTree(self.bot)
 
-    @commands.slash_command()
-    async def rcon(self, ctx: discord.ApplicationContext):
-        await ctx.defer()
+    @self.tree.command(
+        description="Execute RCON command"
+    )
+    async def rcon(self, ctx: ApplicationContext):
+        # Send the modal with an instance of our RconModal class
+        await ctx.send_modal(RconModal())
 
-        modal = RconModal(title="RCON Command")
-        await ctx.send_modal(modal)
+class RconModal(CancellableModal):
+    def __init__(self):
+        super().__init__(title="RCON Command")
 
-class RconModal(ui.CancellableModal):
-    def __init__(self, title):
-        super().__init__(title=title)
-
-        self.ip_input = ui.TextInput(label="Server IP")
-        self.port_input = ui.NumberInput(label="Server Port")
-        self.password_input = ui.TextInput(label="RCON Password")
-        self.command_input = ui.TextInput(label="RCON Command")
+        self.ip_input = TextInput(label="Server IP")
+        self.port_input = NumberInput(label="Server Port")
+        self.password_input = TextInput(label="RCON Password")
+        self.command_input = TextInput(label="RCON Command")
 
         self.add_item(self.ip_input)
         self.add_item(self.port_input)
@@ -44,5 +47,5 @@ class RconModal(ui.CancellableModal):
         except Exception as e:
             await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
-def setup(bot):
+def setup(bot: Red):
     bot.add_cog(RedCon(bot))
