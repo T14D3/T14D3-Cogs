@@ -15,7 +15,11 @@ class RedCon(commands.Cog):
     async def setup_hook(self) -> None:
         await self.tree.sync()
 
-    
+    @app_commands.command()
+    async def run_rcon(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(InputModal())
+
+
 class InputModal(discord.ui.Modal, title='Connection details'):
     input = discord.ui.TextInput(
         label='IP',
@@ -25,9 +29,7 @@ class InputModal(discord.ui.Modal, title='Connection details'):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(f'Test-Response - {self.input.value}', ephemeral=True)
 
-@app_commands.command()
-async def run_rcon(interaction: discord.Interaction):
-    await interaction.response.send_modal(InputModal())
+
 
     
 
