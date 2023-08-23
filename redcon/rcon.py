@@ -21,13 +21,25 @@ class RedCon(commands.Cog):
 
 
 class InputModal(discord.ui.Modal, title='Connection details'):
-    input = discord.ui.TextInput(
+    ip = discord.ui.TextInput(
         label='IP',
         placeholder='Enter IP address',
     )
+    port = discord.ui.TextInput(
+        label='Port',
+        placeholder='Enter remote port',
+    )
+    password = discord.ui.TextInput(
+        label='Password',
+        placeholder='Enter password',
+    )
+    command = discord.ui.TextInput(
+        label='Command',
+        placeholder='RCON-Command to execute',
+    )
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'Test-Response - {self.input.value}', ephemeral=True)
+        await interaction.response.send_message(f'{self.ip.value} {self.port.value} {self.password.value} {self.command.value}', ephemeral=True)
 
 
 
