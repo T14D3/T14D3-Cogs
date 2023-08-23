@@ -1,50 +1,46 @@
 import discord
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option
+from discord.ext import commands, ui
 from rcon import Client
 
 class RedCon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(
-        name="send_rcon",
-        description="Send an RCON command to a server",
-        options=[
-            create_option(
-                name="ip",
-                description="Server IP address",
-                option_type=3,
-                required=True
-            ),
-            create_option(
-                name="port",
-                description="Server port",
-                option_type=4,
-                required=True
-            ),
-            create_option(
-                name="password",
-                description="RCON password",
-                option_type=3,
-                required=True
-            ),
-            create_option(
-                name="command",
-                description="RCON command to send",
-                option_type=3,
-                required=True
-            )
-        ]
-    )
-    async def send_rcon(self, ctx: SlashContext, ip: str, port: int, password: str, command: str):
+    @commands.command()
+    async def rcon(self, ctx):
+        view = RconView()
+        await ctx.send("Please provide RCON details:", view=view, ephemeral=True)
+
+class RconView(ui.View):
+    def __init__(self):
+        super().__init__()
+
+        self.ip_input = ui.TextInput(label="Server IP")
+        self.port_input = ui.NumberInput(label="Server Port")
+        self.password_input = ui.TextInput(label="RCON Password")
+        self.command_input = ui.TextInput(label="RCON Command")
+
+        self.add_item(self.ip_input)
+        self.add_item(self.port_input)
+        self.add_item(self.password_input)
+        self.add_item(self.command_input)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user == self.ctx.author
+
+    @ui.button(label="Execute RCON Command", style=discord.ButtonStyle.primary)
+    async def execute_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        ip = self.ip_input.value
+        port = self.port_input.value
+        password = self.password_input.value
+        command = self.command_input.value
+
         try:
             with Client(ip, port, password) as client:
                 response = client.execute(command)
-            await ctx.send(f"RCON response:\n```\n{response}\n```")
+            await interaction.response.send_message(f'RCON response:\n```\n{response}\n```', ephemeral=True)
         except Exception as e:
-            await ctx.send(f"An error occurred: {e}")
+            await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
 def setup(bot):
-    bot.add_cog(RconCog(bot))
+    bot.add_cog(RedCon(bot))
