@@ -14,8 +14,10 @@ class RedCon(commands.Cog):
         await self.tree.sync()
 
     @app_commands.command()
-    @app_commands.describe('Test')
     async def redcon(self, interaction: discord.Interaction):
+        """
+        Execute an RCON command
+        """
         await interaction.response.send_modal(InputModal())
 
 
