@@ -47,7 +47,7 @@ class InputModal(discord.ui.Modal, title='Connection details'):
         command_value = self.command.value
 
         try:
-            with Client(ip_value, port_value, password_value) as client:
+            with Client(ip_value, port_value, passwd=password_value) as client:
                 client.connect()  # Establish the RCON connection
                 response = client.run(command_value)
             await interaction.response.send_message(f'RCON response:\n```\n{response}\n```', ephemeral=True)
