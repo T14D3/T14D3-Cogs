@@ -9,13 +9,13 @@ class RedCon(commands.Cog):
 
         self.bot = bot
 
-        # self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
         await self.tree.sync()
 
     @app_commands.command()
-    async def run_rcon(self, interaction: discord.Interaction):
+    @app_commands.describe('Test')
+    async def redcon(self, interaction: discord.Interaction):
         await interaction.response.send_modal(InputModal())
 
 
@@ -31,14 +31,13 @@ class InputModal(discord.ui.Modal, title='Connection details'):
     password = discord.ui.TextInput(
         label='Password',
         placeholder='Enter password',
+        required=False,
     )
     command = discord.ui.TextInput(
         label='Command',
-        placeholder='RCON-Command to execute',
+        placeholder='RCON-command to execute',
+        style=discord.TextStyle.long,
     )
-
-    #async def on_submit(self, interaction: discord.Interaction):
-    #    await interaction.response.send_message(f'{self.ip.value} {self.port.value} {self.password.value} {self.command.value}', ephemeral=True)
 
     async def on_submit(self, interaction: discord.Interaction):
         ip_value = self.ip.value
