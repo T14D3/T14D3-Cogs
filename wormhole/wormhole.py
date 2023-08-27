@@ -45,17 +45,7 @@ class WormHole(commands.Cog):
             if destination_id and message.channel.id == int(source_id):
                 destination_channel = self.bot.get_channel(int(destination_id))
                 if destination_channel:
-                    webhook = await self.get_or_create_bot_webhook(destination_channel, message.author)
-                    await webhook.send(message.content, username=message.author.display_name, avatar_url=str(message.author.avatar.url) if message.author.avatar else None)
-    
-    async def get_or_create_bot_webhook(self, channel, author):
-        webhooks = await channel.webhooks()
-        for webhook in webhooks:
-            if webhook.token is None and webhook.user == self.bot.user:
-                return webhook
-        
-        # If a webhook doesn't exist, create a new one
-        return await channel.create_webhook(name=author.display_name)
+                    await destination_channel.send(f"**{message.author.display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
