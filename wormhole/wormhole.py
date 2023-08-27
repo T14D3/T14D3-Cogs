@@ -39,7 +39,7 @@ class WormHole(commands.Cog):
     async def on_message(self, message: discord.Message):
         if not message.guild:  # don't allow in DMs
             return
-        if not message.channel.permissions_for(message.guild.me).send_messages:
+        if message.author.bot or not message.channel.permissions_for(message.guild.me).send_messages:
             return
         
         linked_channels = await self.config.linked_channels_list()
