@@ -3,7 +3,6 @@
       "T14D3"
     ],
     "description": "Wormhole - Allow communication between multiple channels and/or guilds",
-    "hidden": true,
     "install_msg": "Thank you for installing my cog! To get started, take a look at [p]wormhole",
     "short": "wormhole",
     "end_user_data_statement": "This cog does not store end user data.",
