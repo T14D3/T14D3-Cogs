@@ -30,6 +30,14 @@ class WormHole(commands.Cog):
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
     
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        if not message.guild:  # don't allow in DMs
+            return
+        if not message.channel.permissions_for(message.guild.me).send_messages:
+            return
+        await self.on_source_message(message)
+    
     async def on_source_message(self, message):
         if not message.author.bot:
             destination_channel_id = getattr(message.channel, "_relay_destination_id", None)
