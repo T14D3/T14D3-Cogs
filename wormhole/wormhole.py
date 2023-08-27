@@ -19,19 +19,10 @@ class WormHole(commands.Cog):
     async def list_links(self, ctx):
         """List all linked channel pairs."""
         
-        linked_channels = await self.config.get_raw("linked_channels", default={})
-        linked_pairs = [
-            (source_id, dest_id)
-            for source_id, dest_id in linked_channels.items()
-        ]
+        settings_json = await self.config.get_raw()
         
-        if not linked_pairs:
-            await ctx.send("There are no linked channel pairs.")
-            return
-        
-        linked_pairs_info = "\n".join([f"Source Channel ID: {source_id} | Destination Channel ID: {dest_id}" for source_id, dest_id in linked_pairs])
-        await ctx.send("Linked channel pairs:\n" + linked_pairs_info)
-    
+        await ctx.send("Settings JSON:\n" + str(settings_json))
+
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         if message.author.bot or message.guild is None:  # Ignore messages from bots and DMs
