@@ -15,7 +15,7 @@ class WormHole(commands.Cog):
         for source_id, destination_id in linked_channels.items():
             source_channel = self.bot.get_channel(int(source_id))
             if source_channel:
-                self.bot.add_listener(self.on_source_message, "on_message", check=lambda message: message.channel == source_channel)
+                self.bot.add_listener(self.on_source_message, "on_message")
     
     @commands.command()
     async def link(self, ctx, destination_channel_id: int):
@@ -42,7 +42,7 @@ class WormHole(commands.Cog):
             linked_channels = await self.config.get_raw("linked_channels")
             destination_id = linked_channels.get(source_id)
             
-            if destination_id:
+            if destination_id and message.channel.id == int(source_id):
                 destination_channel = self.bot.get_channel(int(destination_id))
                 if destination_channel:
                     webhook = await self.find_bot_webhook(destination_channel)
