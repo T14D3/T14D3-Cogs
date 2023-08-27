@@ -11,9 +11,12 @@ class WormHole(commands.Cog):
         """Link the current channel to a destination channel for sending messages."""
         source_channel_id = ctx.channel.id
         
-        await self.config.set_raw(f"linked_channels.{source_channel_id}", value=destination_channel_id)
+        linked_channels = await self.config.linked_channels()
+        linked_channels[source_channel_id] = destination_channel_id
+        await self.config.linked_channels.set(linked_channels)
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
+
     
     
     @commands.Cog.listener()
