@@ -24,7 +24,7 @@ class WormHole(commands.Cog):
     async def link(self, ctx):
         """Link the current channel to the network and create a webhook."""
         linked_channels = await self.config.linked_channels_list()
-        if ctx.channel.id not in [pair[1] for pair in linked_channels]:
+        if not any(pair[1] == ctx.channel.id for pair in linked_channels):
             webhook = await ctx.channel.create_webhook(name="Wormhole Webhook")
             linked_channels.append((webhook.id, ctx.channel.id))
             await self.config.linked_channels_list.set(linked_channels)
@@ -33,7 +33,6 @@ class WormHole(commands.Cog):
         else:
             await ctx.send("This channel is already linked.")
 
-    
     @commands.command()
     async def unlink(self, ctx):
         """Unlink the current channel from the network and delete the associated webhook."""
