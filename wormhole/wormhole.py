@@ -18,15 +18,26 @@ class WormHole(commands.Cog):
                 self.bot.add_listener(self.on_source_message, "on_message", source=source_channel)  # Add listener for specific channel
     
     @commands.command()
-    async def link(self, ctx, destination_channel_id: int):
+    async def link(self, ctx, destination_channel: discord.TextChannel):
         """Link the current channel to a destination channel for sending messages."""
         source_channel_id = ctx.channel.id
         
         linked_channels = await self.config.get_raw("linked_channels")
-        linked_channels[source_channel_id] = destination_channel_id
+        linked_channels[source_channel_id] = destination_channel.id
         await self.config.set_raw("linked_channels", value=linked_channels)
         
-        await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
+        # Create a webhook if it doesn't exist
+        webhooks = await destination_channel.webhooks()
+        webhook = None
+        for w in webhooks:
+            if w.user == self.bot.user:
+                webhook = w
+                break
+        
+        if not webhook:
+            webhook = await destination_channel.create_webhook(name=self.bot.user.display_name)
+        
+        await ctx.send(f"This channel is now linked to the destination channel {destination_channel.mention}.")
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -45,7 +56,16 @@ class WormHole(commands.Cog):
             if destination_id and message.channel.id == int(source_id):
                 destination_channel = self.bot.get_channel(int(destination_id))
                 if destination_channel:
-                    await destination_channel.send(f"**{message.author.display_name}:** {message.content}")
+                    # Edit the webhook to reflect the user's profile picture and username
+                    webhooks = await destination_channel.webhooks()
+                    webhook = None
+                    for w in webhooks:
+                        if w.user == self.bot.user:
+                            webhook = w
+                            break
+                    
+                    if webhook:
+                        await webhook.edit(name=message.author.display_name, avatar=message.author.avatar_url)
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
