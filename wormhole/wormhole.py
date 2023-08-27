@@ -18,31 +18,36 @@ class WormHole(commands.Cog):
         for channel_id in linked_channels:
             relay_channel = self.bot.get_channel(channel_id)
             if relay_channel and relay_channel != channel:
-                await relay_channel.send(f"**Status:** {message}")
+                await relay_channel.send(f"***The wormhole is shifting...** {message}*")
     
-    @commands.command()
-    async def link(self, ctx):
+    @commands.group()
+    async def wormhole(self, ctx):
+        """Manage wormhole connections."""
+        pass
+    
+    @wormhole.command(name="open")
+    async def wormhole_open(self, ctx):
         """Link the current channel to the network."""
         linked_channels = await self.config.linked_channels_list()
         if ctx.channel.id not in linked_channels:
             linked_channels.append(ctx.channel.id)
             await self.config.linked_channels_list.set(linked_channels)
-            await ctx.send("This channel is now linked to the network.")
-            await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.", ctx.channel)
+            await ctx.send("This channel has joined the ever-changing maelstom that is the wormhole.")
+            await self.send_status_message(f"A faint signal was picked up from {ctx.channel.mention}, connection has been established.", ctx.channel)
         else:
-            await ctx.send("This channel is already linked.")
+            await ctx.send("This channel is already part of the wormhole.")
     
-    @commands.command()
-    async def unlink(self, ctx):
+    @wormhole.command(name="close")
+    async def wormhole_close(self, ctx):
         """Unlink the current channel from the network."""
         linked_channels = await self.config.linked_channels_list()
         if ctx.channel.id in linked_channels:
             linked_channels.remove(ctx.channel.id)
             await self.config.linked_channels_list.set(linked_channels)
-            await ctx.send("This channel is no longer linked to the network.")
-            await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.", ctx.channel)
+            await ctx.send("This channel has been severed from the wormhole.")
+            await self.send_status_message(f"The signal from {ctx.channel.mention} has become too faint to be picked up, the connection was lost.", ctx.channel)
         else:
-            await ctx.send("This channel is not linked.")
+            await ctx.send("This channel is not part of the wormhole.")
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -59,7 +64,7 @@ class WormHole(commands.Cog):
                 if channel_id != message.channel.id:
                     channel = self.bot.get_channel(channel_id)
                     if channel:
-                        await channel.send(f"**{message.author.global_name}:** {message.content}")
+                        await channel.send(f"**{message.author.display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
