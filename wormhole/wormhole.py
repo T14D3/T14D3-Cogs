@@ -50,7 +50,7 @@ class WormHole(commands.Cog):
             return
         if message.author.bot or not message.channel.permissions_for(message.guild.me).send_messages:
             return
-        if message.content.startswith(commands.when_mentioned(self.bot, message)[0]):
+        if isinstance(message.channel, discord.TextChannel) and message.content.startswith(commands.when_mentioned(self.bot, message)[0]):
             return  # Ignore bot commands
         
         linked_channels = await self.config.linked_channels_list()
