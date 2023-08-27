@@ -58,7 +58,7 @@ class WormHole(commands.Cog):
             await self.config.linked_channels_list.set(linked_channels)
             
             # Delete the webhook
-            webhook = discord.Webhook.partial(webhook_id_to_remove, token=None, session=self.bot.session)
+            webhook = discord.Webhook.partial(webhook_id_to_remove, token=None)
             await webhook.delete()
             
             # Inform the user
@@ -83,7 +83,7 @@ class WormHole(commands.Cog):
             for webhook_id, channel_id in linked_channels:
                 if channel_id != message.channel.id:
                     # Retrieve the webhook and send the message
-                    webhook = discord.Webhook.partial(webhook_id, token=None, session=self.bot.session)
+                    webhook = discord.Webhook.partial(webhook_id, token=None)
                     await webhook.send(f"**{message.author.display_name}:** {message.content}")
                     break  # Send only to the first linked channel
     
