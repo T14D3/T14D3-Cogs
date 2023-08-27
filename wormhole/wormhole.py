@@ -15,7 +15,7 @@ class WormHole(commands.Cog):
         for source_id, destination_id in linked_channels.items():
             source_channel = self.bot.get_channel(int(source_id))
             if source_channel:
-                self.bot.add_listener(self.on_source_message, "on_message")
+                self.bot.add_listener(self.on_source_message, "on_message", source=source_channel)  # Add listener for specific channel
     
     @commands.command()
     async def link(self, ctx, destination_channel_id: int):
