@@ -21,9 +21,9 @@ class WormHole(commands.Cog):
             return
         if not message.channel.permissions_for(message.guild.me).send_messages:
             return
-        await self.some_command_function(message)
+        await self.send_message_through_webhook(message)
     
-    async def some_command_function(self, message: discord.Message):
+    async def send_message_through_webhook(self, message: discord.Message):
         source_channel_id = message.channel.id
         
         destination_channel_id = await self.config.get_raw(f"linked_channels.{source_channel_id}")
@@ -35,8 +35,12 @@ class WormHole(commands.Cog):
         if not destination_channel:
             return
         
-        content = f'I heard you say "{message.content}"'
-        await destination_channel.send(content)
+        webhook = await self.find_bot_webhook(destination_channel)
+        
+        if not webhook:
+            webhook = await destination_channel.create_webhook(name=message.author.display_name)
+        
+        await webhook.send(message.content, username=message.author.display_name, avatar_url=str(message.author.avatar.url) if message.author.avatar else None)
     
     async def find_bot_webhook(self, channel):
         webhooks = await channel.webhooks()
