@@ -7,10 +7,12 @@ class WormHole(commands.Cog):
         self.config = Config.get_conf(self, identifier="wormhole", force_registration=True)
         self.config.register_global(linked_channels_list=[])  # Initialize the configuration
         
+        # Start setup listeners when the bot is ready
         self.bot.loop.create_task(self.setup_listeners())
         
     async def setup_listeners(self):
         await self.bot.wait_until_ready()
+        # Add the on_source_message listener to the on_message event
         self.bot.add_listener(self.on_source_message, "on_message")
     
     async def send_status_message(self, message, channel):
@@ -46,7 +48,7 @@ class WormHole(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
-        if not message.guild:  # don't allow in DMs
+        if not message.guild:  # Don't allow in DMs
             return
         if message.author.bot or not message.channel.permissions_for(message.guild.me).send_messages:
             return
