@@ -17,7 +17,7 @@ class WormHole(commands.Cog):
     
     async def send_status_message(self, message, channel):
         linked_channels = await self.config.linked_channels_list()
-        for channel_id in linked_channels:
+        for webhook_id, channel_id in linked_channels:
             relay_channel = self.bot.get_channel(channel_id)
             if relay_channel and relay_channel != channel:
                 await relay_channel.send(f"**Status:** {message}")
@@ -26,7 +26,7 @@ class WormHole(commands.Cog):
     async def link(self, ctx):
         """Link the current channel to the network and create a webhook."""
         linked_channels = await self.config.linked_channels_list()
-        if ctx.channel.id not in linked_channels:
+        if ctx.channel.id not in [pair[1] for pair in linked_channels]:
             # Create a webhook in the current channel
             webhook = await ctx.channel.create_webhook(name="Wormhole Webhook")
             
@@ -79,7 +79,7 @@ class WormHole(commands.Cog):
             return  # Ignore bot commands
         
         linked_channels = await self.config.linked_channels_list()
-        if message.channel.id in linked_channels:
+        if message.channel.id in [pair[1] for pair in linked_channels]:
             for webhook_id, channel_id in linked_channels:
                 if channel_id != message.channel.id:
                     # Retrieve the webhook and send the message
