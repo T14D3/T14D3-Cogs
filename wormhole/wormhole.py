@@ -32,6 +32,7 @@ class WormHole(commands.Cog):
             await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.", ctx.channel)
         else:
             await ctx.send("This channel is already linked.")
+
     
     @commands.command()
     async def unlink(self, ctx):
@@ -54,6 +55,7 @@ class WormHole(commands.Cog):
             await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.", ctx.channel)
         else:
             await ctx.send("This channel is not linked.")
+
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
