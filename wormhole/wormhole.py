@@ -24,24 +24,47 @@ class WormHole(commands.Cog):
     
     @commands.command()
     async def link(self, ctx):
-        """Link the current channel to the network."""
+        """Link the current channel to the network and create a webhook."""
         linked_channels = await self.config.linked_channels_list()
         if ctx.channel.id not in linked_channels:
-            linked_channels.append(ctx.channel.id)
+            # Create a webhook in the current channel
+            webhook = await ctx.channel.create_webhook(name="Wormhole Webhook")
+            
+            # Add the webhook ID and channel ID pair to the list
+            linked_channels.append((webhook.id, ctx.channel.id))
             await self.config.linked_channels_list.set(linked_channels)
+            
+            # Inform the user
             await ctx.send("This channel is now linked to the network.")
+            
+            # Send a status message to connected channels
             await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.", ctx.channel)
         else:
             await ctx.send("This channel is already linked.")
     
     @commands.command()
     async def unlink(self, ctx):
-        """Unlink the current channel from the network."""
+        """Unlink the current channel from the network and delete the associated webhook."""
         linked_channels = await self.config.linked_channels_list()
-        if ctx.channel.id in linked_channels:
-            linked_channels.remove(ctx.channel.id)
+        webhook_id_to_remove = None
+        for webhook_id, channel_id in linked_channels:
+            if channel_id == ctx.channel.id:
+                webhook_id_to_remove = webhook_id
+                break
+        
+        if webhook_id_to_remove:
+            # Remove the webhook ID and channel ID pair from the list
+            linked_channels = [(webhook_id, channel_id) for webhook_id, channel_id in linked_channels if webhook_id != webhook_id_to_remove]
             await self.config.linked_channels_list.set(linked_channels)
+            
+            # Delete the webhook
+            webhook = discord.Webhook.partial(webhook_id_to_remove, token=None, session=self.bot.session)
+            await webhook.delete()
+            
+            # Inform the user
             await ctx.send("This channel is no longer linked to the network.")
+            
+            # Send a status message to connected channels
             await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.", ctx.channel)
         else:
             await ctx.send("This channel is not linked.")
@@ -57,11 +80,12 @@ class WormHole(commands.Cog):
         
         linked_channels = await self.config.linked_channels_list()
         if message.channel.id in linked_channels:
-            for channel_id in linked_channels:
+            for webhook_id, channel_id in linked_channels:
                 if channel_id != message.channel.id:
-                    channel = self.bot.get_channel(channel_id)
-                    if channel:
-                        await channel.send(f"**{message.author.display_name}:** {message.content}")
+                    # Retrieve the webhook and send the message
+                    webhook = discord.Webhook.partial(webhook_id, token=None, session=self.bot.session)
+                    await webhook.send(f"**{message.author.display_name}:** {message.content}")
+                    break  # Send only to the first linked channel
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
