@@ -17,10 +17,11 @@ class WormHole(commands.Cog):
             await ctx.send("This channel is already linked to a destination channel.")
             return
         
-        linked_channels[source_channel_id] = destination_channel_id
+        linked_channels[source_channel_id] = {"origin": source_channel_id, "destination": destination_channel_id}
         await self.config.linked_channels.set(linked_channels)
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
+
 
 
     
