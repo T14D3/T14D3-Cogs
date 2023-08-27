@@ -28,10 +28,11 @@ class WormHole(commands.Cog):
             await existing_webhook.edit(name=ctx.author.display_name, avatar=ctx.author.avatar.url)
         else:
             # Create a new webhook with the user's profile picture and name
-            webhook = await channel.create_webhook(name=ctx.author.display_name, avatar=str(ctx.author.avatar.url))
+            webhook = await channel.create_webhook(name=ctx.author.display_name)
         
         # Send the message using the webhook
-        await webhook.send(message, username=ctx.author.display_name, avatar_url=str(ctx.author.avatar.url))
+        avatar_url = str(ctx.author.avatar.url) if ctx.author.avatar else None
+        await webhook.send(message, username=ctx.author.display_name, avatar_url=avatar_url)
         
         await ctx.send(f"Message sent to {channel.mention} using your profile information.")
     
