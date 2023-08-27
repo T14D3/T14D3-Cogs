@@ -5,6 +5,8 @@ class WormHole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier="wormhole", force_registration=True)
+        self.config.register_global(linked_channels={})  # Initialize the configuration
+        
         self.bot.loop.create_task(self.setup_listeners())
         
     async def setup_listeners(self):
