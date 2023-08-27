@@ -60,9 +60,10 @@ class WormHole(commands.Cog):
         webhook = await self.find_bot_webhook(destination_channel)
         
         if not webhook:
-            webhook = await destination_channel.create_webhook(name=message.author.display_name)
+            return
         
-        await webhook.send(message.content, username=message.author.display_name, avatar_url=str(message.author.avatar.url) if message.author.avatar else None)
+        await webhook.edit(name=message.author.display_name, avatar=None if not message.author.avatar else await message.author.avatar.read(), reason="Webhook update")
+        await webhook.send(message.content)
     
     async def find_bot_webhook(self, channel):
         webhooks = await channel.webhooks()
