@@ -15,10 +15,10 @@ class WormHole(commands.Cog):
             return
         
         # Create a webhook with the user's profile picture and name
-        webhook = await channel.create_webhook(name=ctx.author.display_name, avatar=ctx.author.avatar_url)
+        webhook = await channel.create_webhook(name=ctx.author.display_name, avatar=ctx.author.avatar.url)
         
         # Send the message using the webhook
-        await webhook.send(message, username=ctx.author.display_name, avatar_url=ctx.author.avatar_url)
+        await webhook.send(message, username=ctx.author.display_name, avatar_url=ctx.author.avatar.url)
         
         await ctx.send(f"Message sent to {channel.mention} using your profile information.")
     
