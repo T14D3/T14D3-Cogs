@@ -33,11 +33,12 @@ class WormHole(commands.Cog):
         
         webhook = await self.find_bot_webhook(destination_channel)
         
-        if webhook:
-            await webhook.send(message, username=ctx.author.display_name, avatar_url=str(ctx.author.avatar.url) if ctx.author.avatar else None)
-            await ctx.send(f"Message sent to the linked destination channel using your profile information.")
-        else:
-            await ctx.send("Webhook not found in the destination channel. Please make sure the bot has the necessary permissions.")
+        if not webhook:
+            # Create a new webhook with the user's profile picture and name
+            webhook = await destination_channel.create_webhook(name=ctx.author.display_name)
+        
+        await webhook.send(message, username=ctx.author.display_name, avatar_url=str(ctx.author.avatar.url) if ctx.author.avatar else None)
+        await ctx.send("Message sent to the linked destination channel using your profile information.")
     
     async def find_bot_webhook(self, channel):
         webhooks = await channel.webhooks()
