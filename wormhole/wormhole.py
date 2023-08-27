@@ -11,7 +11,7 @@ class WormHole(commands.Cog):
         
     async def setup_listeners(self):
         await self.bot.wait_until_ready()
-        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels = await self.config.linked_channels()
         for source_id, destination_id in linked_channels.items():
             source_channel = self.bot.get_channel(int(source_id))
             if source_channel:
@@ -22,11 +22,24 @@ class WormHole(commands.Cog):
         """Link the current channel to a destination channel for sending messages."""
         source_channel_id = ctx.channel.id
         
-        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels = await self.config.linked_channels()
         linked_channels[source_channel_id] = destination_channel_id
-        await self.config.set_raw("linked_channels", value=linked_channels)
+        await self.config.linked_channels.set(linked_channels)
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
+    
+    @commands.command()
+    async def unlink(self, ctx, source_channel: discord.TextChannel):
+        """Unlink the specified source channel."""
+        source_channel_id = source_channel.id
+        
+        linked_channels = await self.config.linked_channels()
+        if source_channel_id in linked_channels:
+            del linked_channels[source_channel_id]
+            await self.config.linked_channels.set(linked_channels)
+            await ctx.send(f"This channel is no longer linked to any destination channel.")
+        else:
+            await ctx.send(f"This channel is not linked to any destination channel.")
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -39,7 +52,7 @@ class WormHole(commands.Cog):
     async def on_source_message(self, message):
         if not message.author.bot:
             source_id = str(message.channel.id)
-            linked_channels = await self.config.get_raw("linked_channels")
+            linked_channels = await self.config.linked_channels()
             destination_id = linked_channels.get(source_id)
             
             if destination_id and message.channel.id == int(source_id):
