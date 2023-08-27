@@ -11,12 +11,10 @@ class WormHole(commands.Cog):
         
     async def setup_listeners(self):
         await self.bot.wait_until_ready()
-        source_channels = await self.config.all()
-        linked_channels = source_channels.get("linked_channels", {})
+        linked_channels = await self.config.get_raw("linked_channels")
         for source_id, destination_id in linked_channels.items():
             source_channel = self.bot.get_channel(int(source_id))
             if source_channel:
-                source_channel._relay_destination_id = int(destination_id)
                 self.bot.add_listener(self.on_source_message, "on_message", check=lambda message: message.channel == source_channel)
     
     @commands.command()
@@ -40,9 +38,12 @@ class WormHole(commands.Cog):
     
     async def on_source_message(self, message):
         if not message.author.bot:
-            destination_channel_id = getattr(message.channel, "_relay_destination_id", None)
-            if destination_channel_id:
-                destination_channel = self.bot.get_channel(destination_channel_id)
+            source_id = str(message.channel.id)
+            linked_channels = await self.config.get_raw("linked_channels")
+            destination_id = linked_channels.get(source_id)
+            
+            if destination_id:
+                destination_channel = self.bot.get_channel(int(destination_id))
                 if destination_channel:
                     webhook = await self.find_bot_webhook(destination_channel)
                     if not webhook:
