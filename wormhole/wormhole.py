@@ -21,13 +21,12 @@ class WormHole(commands.Cog):
             return
         
         source_id = str(message.channel.id)
-        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels = await self.config.linked_channels()
         destination_id = linked_channels.get(source_id)
         
         if destination_id and message.channel.id == int(source_id):
             destination_channel = self.bot.get_channel(int(destination_id))
             if destination_channel:
-                # Edit the webhook to reflect the user's profile picture and username
                 webhooks = await destination_channel.webhooks()
                 webhook = None
                 for w in webhooks:
@@ -43,9 +42,9 @@ class WormHole(commands.Cog):
         """Link the current channel to a destination channel for sending messages."""
         source_channel_id = ctx.channel.id
         
-        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels = await self.config.linked_channels()
         linked_channels[source_channel_id] = destination_channel.id
-        await self.config.set_raw("linked_channels", value=linked_channels)
+        await self.config.linked_channels.set(linked_channels)
         
         # Create a webhook if it doesn't exist
         webhooks = await destination_channel.webhooks()
