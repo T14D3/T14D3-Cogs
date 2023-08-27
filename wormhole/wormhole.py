@@ -20,7 +20,7 @@ class WormHole(commands.Cog):
         """Show all linked channel pairs for this channel."""
         source_channel_id = ctx.channel.id
         
-        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels = await self.config.get_raw("linked_channels", default={})
         linked_pairs = [
             (source_id, dest_id)
             for source_id, dest_id in linked_channels.items()
