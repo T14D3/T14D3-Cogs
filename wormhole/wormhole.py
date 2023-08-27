@@ -59,7 +59,7 @@ class WormHole(commands.Cog):
                 if channel_id != message.channel.id:
                     channel = self.bot.get_channel(channel_id)
                     if channel:
-                        await channel.send(f"**{message.author.display_name}:** {message.content}")
+                        await channel.send(f"**{message.author.name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
