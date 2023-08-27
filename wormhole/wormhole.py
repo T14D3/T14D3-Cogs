@@ -13,12 +13,12 @@ class WormHole(commands.Cog):
         await self.bot.wait_until_ready()
         self.bot.add_listener(self.on_source_message, "on_message")
     
-    async def send_status_message(self, message):
+    async def send_status_message(self, message, channel):
         linked_channels = await self.config.linked_channels_list()
         for channel_id in linked_channels:
-            channel = self.bot.get_channel(channel_id)
-            if channel and channel != message.channel:
-                await channel.send(f"**Status:** {message}")
+            relay_channel = self.bot.get_channel(channel_id)
+            if relay_channel and relay_channel != channel:
+                await relay_channel.send(f"**Status:** {message}")
     
     @commands.command()
     async def link(self, ctx):
@@ -28,7 +28,7 @@ class WormHole(commands.Cog):
             linked_channels.append(ctx.channel.id)
             await self.config.linked_channels_list.set(linked_channels)
             await ctx.send("This channel is now linked to the network.")
-            await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.")
+            await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.", ctx.channel)
         else:
             await ctx.send("This channel is already linked.")
     
@@ -40,7 +40,7 @@ class WormHole(commands.Cog):
             linked_channels.remove(ctx.channel.id)
             await self.config.linked_channels_list.set(linked_channels)
             await ctx.send("This channel is no longer linked to the network.")
-            await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.")
+            await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.", ctx.channel)
         else:
             await ctx.send("This channel is not linked.")
     
