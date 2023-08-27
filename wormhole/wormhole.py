@@ -15,27 +15,6 @@ class WormHole(commands.Cog):
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
     
-    @commands.command()
-    async def show_links(self, ctx):
-        """Show all linked channel pairs for this channel."""
-        source_channel_id = ctx.channel.id
-        
-        linked_channels = await self.config.get_raw("linked_channels", default={})
-        linked_pairs = [
-            (source_id, dest_id)
-            for source_id, dest_id in linked_channels.items()
-            if dest_id == source_channel_id
-        ]
-        
-        if not linked_pairs:
-            await ctx.send("This channel is not linked to any destination channels.")
-            return
-        
-        response = "Linked channel pairs:\n"
-        for source_id, _ in linked_pairs:
-            response += f"Source Channel ID: {source_id}\n"
-        
-        await ctx.send(response)
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
