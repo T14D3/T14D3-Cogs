@@ -24,9 +24,9 @@ class WormHole(commands.Cog):
     async def link(self, ctx):
         """Link the current channel to the network and create a webhook."""
         linked_channels = await self.config.linked_channels_list()
-        if not any(pair[1] == ctx.channel.id for pair in linked_channels):
+        if not any(pair['channel_id'] == ctx.channel.id for pair in linked_channels):
             webhook = await ctx.channel.create_webhook(name="Wormhole Webhook")
-            linked_channels.append((webhook.id, ctx.channel.id))
+            linked_channels.append({'webhook_id': webhook.id, 'channel_id': ctx.channel.id})
             await self.config.linked_channels_list.set(linked_channels)
             await ctx.send("This channel is now linked to the network.")
             await self.send_status_message(f"Channel {ctx.channel.mention} has been added to the network.", ctx.channel)
@@ -38,13 +38,13 @@ class WormHole(commands.Cog):
         """Unlink the current channel from the network and delete the associated webhook."""
         linked_channels = await self.config.linked_channels_list()
         webhook_id_to_remove = None
-        for webhook_id, channel_id in linked_channels:
-            if channel_id == ctx.channel.id:
-                webhook_id_to_remove = webhook_id
+        for pair in linked_channels:
+            if pair['channel_id'] == ctx.channel.id:
+                webhook_id_to_remove = pair['webhook_id']
                 break
         
         if webhook_id_to_remove:
-            linked_channels = [(webhook_id, channel_id) for webhook_id, channel_id in linked_channels if webhook_id != webhook_id_to_remove]
+            linked_channels = [pair for pair in linked_channels if pair['webhook_id'] != webhook_id_to_remove]
             await self.config.linked_channels_list.set(linked_channels)
             
             webhook = discord.Webhook.partial(webhook_id_to_remove, token=None, session=self.bot.session)
@@ -54,7 +54,6 @@ class WormHole(commands.Cog):
             await self.send_status_message(f"Channel {ctx.channel.mention} has been removed from the network.", ctx.channel)
         else:
             await ctx.send("This channel is not linked.")
-
     
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
