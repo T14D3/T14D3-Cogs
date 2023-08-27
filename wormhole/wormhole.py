@@ -15,30 +15,28 @@ class WormHole(commands.Cog):
         
         await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
     
-    @commands.command()
-    async def sendmessage(self, ctx, *, message: str):
-        """Send a message to the linked destination channel using a webhook."""
-        source_channel_id = ctx.channel.id
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        if not message.guild:  # don't allow in DMs
+            return
+        if not message.channel.permissions_for(message.guild.me).send_messages:
+            return
+        await self.some_command_function(message)
+    
+    async def some_command_function(self, message: discord.Message):
+        source_channel_id = message.channel.id
         
         destination_channel_id = await self.config.get_raw(f"linked_channels.{source_channel_id}")
         if not destination_channel_id:
-            await ctx.send("This channel is not linked to a destination channel.")
             return
         
         destination_channel = self.bot.get_channel(destination_channel_id)
         
         if not destination_channel:
-            await ctx.send("The linked destination channel does not exist.")
             return
         
-        webhook = await self.find_bot_webhook(destination_channel)
-        
-        if not webhook:
-            # Create a new webhook with the user's profile picture and name
-            webhook = await destination_channel.create_webhook(name=ctx.author.display_name)
-        
-        await webhook.send(message, username=ctx.author.display_name, avatar_url=str(ctx.author.avatar.url) if ctx.author.avatar else None)
-        await ctx.send("Message sent to the linked destination channel using your profile information.")
+        content = f'I heard you say "{message.content}"'
+        await destination_channel.send(content)
     
     async def find_bot_webhook(self, channel):
         webhooks = await channel.webhooks()
