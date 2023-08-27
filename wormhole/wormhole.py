@@ -25,10 +25,10 @@ class WormHole(commands.Cog):
         
         if existing_webhook:
             # Update the existing webhook's profile picture and name
-            await existing_webhook.edit(name=ctx.author.display_name, avatar=ctx.author.avatar_url)
+            await existing_webhook.edit(name=ctx.author.display_name, avatar=ctx.author.avatar.url)
         else:
             # Create a new webhook with the user's profile picture and name
-            webhook = await channel.create_webhook(name=ctx.author.display_name, avatar=ctx.author.avatar.url)
+            webhook = await channel.create_webhook(name=ctx.author.display_name, avatar=str(ctx.author.avatar.url))
         
         # Send the message using the webhook
         await webhook.send(message, username=ctx.author.display_name, avatar_url=str(ctx.author.avatar.url))
