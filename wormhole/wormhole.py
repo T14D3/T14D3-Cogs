@@ -11,53 +11,41 @@ class WormHole(commands.Cog):
         
     async def setup_listeners(self):
         await self.bot.wait_until_ready()
-    
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        if message.author.bot:
-            return
-        
-        if not message.guild:
-            return
-        
-        source_id = str(message.channel.id)
-        linked_channels = await self.config.linked_channels()
-        destination_id = linked_channels.get(source_id)
-        
-        if destination_id and message.channel.id == int(source_id):
-            destination_channel = self.bot.get_channel(int(destination_id))
-            if destination_channel:
-                webhooks = await destination_channel.webhooks()
-                webhook = None
-                for w in webhooks:
-                    if w.user == self.bot.user:
-                        webhook = w
-                        break
-                
-                if webhook:
-                    await webhook.edit(name=message.author.display_name, avatar=message.author.avatar_url)
+        linked_channels = await self.config.get_raw("linked_channels")
+        for source_id, destination_id in linked_channels.items():
+            source_channel = self.bot.get_channel(int(source_id))
+            if source_channel:
+                self.bot.add_listener(self.on_source_message, "on_message", source=source_channel)  # Add listener for specific channel
     
     @commands.command()
-    async def link(self, ctx, destination_channel: discord.TextChannel):
+    async def link(self, ctx, destination_channel_id: int):
         """Link the current channel to a destination channel for sending messages."""
         source_channel_id = ctx.channel.id
         
-        linked_channels = await self.config.linked_channels()
-        linked_channels[source_channel_id] = destination_channel.id
-        await self.config.linked_channels.set(linked_channels)
+        linked_channels = await self.config.get_raw("linked_channels")
+        linked_channels[source_channel_id] = destination_channel_id
+        await self.config.set_raw("linked_channels", value=linked_channels)
         
-        # Create a webhook if it doesn't exist
-        webhooks = await destination_channel.webhooks()
-        webhook = None
-        for w in webhooks:
-            if w.user == self.bot.user:
-                webhook = w
-                break
+        await ctx.send(f"This channel is now linked to the destination channel with ID {destination_channel_id}.")
+    
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        if not message.guild:  # don't allow in DMs
+            return
+        if not message.channel.permissions_for(message.guild.me).send_messages:
+            return
+        await self.on_source_message(message)
+    
+    async def on_source_message(self, message):
+        if not message.author.bot:
+            source_id = str(message.channel.id)
+            linked_channels = await self.config.get_raw("linked_channels")
+            destination_id = linked_channels.get(source_id)
             
-        if not webhook:
-            webhook = await destination_channel.create_webhook(name=self.bot.user.display_name)
-        
-        await ctx.send(f"This channel is now linked to the destination channel {destination_channel.mention}.")
+            if destination_id and message.channel.id == int(source_id):
+                destination_channel = self.bot.get_channel(int(destination_id))
+                if destination_channel:
+                    await destination_channel.send(f"**{message.author.display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
