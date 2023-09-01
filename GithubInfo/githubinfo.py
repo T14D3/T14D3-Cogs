@@ -3,7 +3,7 @@ from redbot.core import commands, Config, checks
 import aiohttp
 import asyncio
 
-class GitHubCog(commands.Cog):
+class GithubInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
@@ -53,7 +53,3 @@ class GitHubCog(commands.Cog):
             channel.id, value=repo_url, cog_name=None
         )
         await ctx.send(f"GitHub repo set for {channel.mention}.")
-
-def setup(bot):
-    cog = GitHubCog(bot)
-    bot.add_cog(cog)
