@@ -1,23 +1,25 @@
 import discord
 from redbot.core import commands
-import aiohttp
+from github import Github
 
 class githubstarupdater(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def fetch_stars(self, repo_url, api_key):
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Accept": "application/vnd.github.v3+json",  # Specify JSON response
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"{repo_url}/stargazers", headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return len(data)
-                else:
-                    return None
+        # Initialize PyGithub with the access token
+        g = Github(api_key)
+        
+        repo_parts = repo_url.strip("/").split("/")
+        if len(repo_parts) == 2:
+            owner, repo_name = repo_parts
+            try:
+                repo = g.get_repo(f"{owner}/{repo_name}")
+                stars = repo.stargazers_count
+                return stars
+            except Exception as e:
+                print(f"Failed to fetch stars: {e}")
+        return None
 
     @commands.command()
     async def updatestars(self, ctx, channel: discord.VoiceChannel, repo_url: str):
