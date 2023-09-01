@@ -14,6 +14,7 @@ class GithubInfo(commands.Cog):
         
         # Start the update loop
         self.bot.loop.create_task(self.update_star_channels())
+        print("Update loop started.")
 
     async def fetch_stars(self, repo_url, api_key):
         headers = {
@@ -25,6 +26,7 @@ class GithubInfo(commands.Cog):
                 return len(data)
 
     async def update_star_channels(self):
+        print("Update loop triggered")
         await self.bot.wait_until_ready()
         while True:
             github_keys = await self.bot.get_shared_api_tokens("github")
@@ -39,7 +41,7 @@ class GithubInfo(commands.Cog):
                             await channel.edit(name=f"{stars} Stars")
                     except Exception as e:
                         print(f"Error updating channel: {e}")
-            await asyncio.sleep(300)  # 5 minutes
+            await asyncio.sleep(10)  # 5 minutes
 
     @commands.group()
     async def github(self, ctx):
