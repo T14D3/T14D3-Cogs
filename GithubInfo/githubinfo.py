@@ -6,7 +6,7 @@ import asyncio
 class GithubInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890)  # Change the identifier to a unique integer
+        self.config = Config.get_conf(self, identifier=786128734626)  # Change the identifier to a unique integer
         self.config.register_global(github_token=None, text_template="GitHub Stars: {}")
         self.config.register_guild(channels={})
         self.task = None
