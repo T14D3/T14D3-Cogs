@@ -25,7 +25,7 @@ class GithubInfo(commands.Cog):
             stars = repo.stargazers_count
 
             # Send the stars count to the Discord channel
-            await ctx.send(f"The repository {repo_name} has {stars} stars on GitHub.")
+            await ctx.send(f"{stars}")
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
