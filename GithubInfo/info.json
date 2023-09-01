@@ -1,0 +1,17 @@
+{
+    "author": [
+      "T14D3"
+    ],
+    "description": "GitHub Stars Query",
+    "hidden": true,
+    "install_msg": "DO NOT USE",
+    "short": "GHStars",
+    "end_user_data_statement": "This cog does not store end user data.",
+    "min_bot_version": "3.5.0",
+    "requirements": [
+        "github"
+    ],
+    "tags": [
+      "github", "tools", "utility"
+    ]
+  }
