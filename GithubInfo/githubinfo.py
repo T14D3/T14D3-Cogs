@@ -6,13 +6,17 @@ import asyncio
 class GithubInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
+        self.config = Config.get_conf(self, identifier=8298196723, force_registration=True)
         default_global = {
             "channel_repo_mappings": {},
         }
         self.config.register_global(**default_global)
 
-    async def fetch_stars(self, repo_url, api_key):
+    async def fetch_stars(self, repo_url):
+        github_keys = await self.bot.get_shared_api_tokens("github")
+        api_key = github_keys.get("api_key")
+        if not api_key:
+            return None  # Handle the case where the API key is not set
         headers = {
             "Authorization": f"Bearer {api_key}",
         }
