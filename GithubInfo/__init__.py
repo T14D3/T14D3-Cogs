@@ -1,5 +1,5 @@
-from .githubinfo import GithubStarUpdater
+from .githubinfo import githubstarupdater
 
 async def setup(bot):
-    cog = GithubStarUpdater(bot)
+    cog = githubstarupdater(bot)
     await bot.add_cog(cog)

@@ -2,7 +2,7 @@ import discord
 from redbot.core import commands
 import aiohttp
 
-class GithubStarUpdater(commands.Cog):
+class githubstarupdater(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,7 +26,3 @@ class GithubStarUpdater(commands.Cog):
             await ctx.send(f"Updated {channel.mention} with {stars} Stars.")
         else:
             await ctx.send("GitHub API key is not set. Please set it using Red's API store.")
-
-def setup(bot):
-    cog = GithubStarUpdater(bot)
-    bot.add_cog(cog)
