@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands
-from github import Github, GithubException
+from github import Github, GithubException, Auth
 
 class githubstarupdater(commands.Cog):
     def __init__(self, bot):
@@ -9,7 +9,8 @@ class githubstarupdater(commands.Cog):
     async def fetch_stars(self, repo_url, api_key):
         try:
             # Initialize PyGithub with the access token
-            auth = Github(api_key)
+            auth = Auth.GithubToken(api_key)
+            g = Github(auth=auth)
             
             # Extract owner and repo name from the URL
             parts = repo_url.strip("/").split("/")
@@ -17,7 +18,7 @@ class githubstarupdater(commands.Cog):
                 owner = parts[-2]
                 repo_name = parts[-1]
 
-                repo = auth.get_repo(f"{owner}/{repo_name}")
+                repo = g.get_repo(f"{owner}/{repo_name}")
                 stars = repo.stargazers_count
                 return stars
         except GithubException as e:
