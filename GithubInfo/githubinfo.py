@@ -50,6 +50,6 @@ class GithubInfo(commands.Cog):
     async def setrepo(self, ctx, channel: discord.VoiceChannel, repo_url: str):
         """Set a GitHub repo for a voice channel."""
         await self.config.channel_repo_mappings.set_raw(
-            channel.id, value=repo_url, cog_name=None
+            str(channel.id), value=repo_url
         )
         await ctx.send(f"GitHub repo set for {channel.mention}.")
