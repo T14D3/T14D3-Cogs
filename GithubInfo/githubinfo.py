@@ -11,6 +11,10 @@ class GithubInfo(commands.Cog):
         self.config.register_guild(channels={})
         self.task = None
 
+        # Start the auto-updater task when the cog is loaded
+        if not self.task or self.task.done():
+            self.task = self.bot.loop.create_task(self.update_voice_channels())
+
     async def update_voice_channels(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
@@ -49,9 +53,16 @@ class GithubInfo(commands.Cog):
 
     @commands.command()
     async def githubinfo(self, ctx, *args):
-        """Main command for GitHub info."""
+        """
+        Main command for GitHub info.
+
+        Usage:
+        [p]githubinfo stars <Repo link> - Manually query GitHub stars.
+        [p]githubinfo channel <Channel-ID> <Repo Link> <Message> - Add a channel for GitHub stars updates.
+        [p]githubinfo removechannel <ChannelID> - Remove a channel from GitHub stars updates.
+        """
         if not args:
-            return await ctx.send("Usage: `[p]githubinfo stars <Repo link>` or `[p]githubinfo channel <Channel-ID> <Repo Link> <Message>`")
+            return
 
         subcommand = args[0].lower()
         if subcommand == "stars":
@@ -60,8 +71,6 @@ class GithubInfo(commands.Cog):
             await self.add_channel(ctx, args[1:])
         elif subcommand == "removechannel":
             await self.remove_channel(ctx, args[1])
-        else:
-            await ctx.send("Invalid subcommand. Usage: `[p]githubinfo stars <Repo link>` or `[p]githubinfo channel <Channel-ID> <Repo Link> <Message>`")
 
     async def github_stars(self, ctx, repo_link):
         """Manually query GitHub stars."""
