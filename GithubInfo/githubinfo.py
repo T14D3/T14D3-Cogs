@@ -49,7 +49,7 @@ class GithubInfo(commands.Cog):
                         except Exception as e:
                             print(f"An error occurred: {str(e)}")
 
-            await asyncio.sleep(300)  # Sleep for 5 minutes
+            await asyncio.sleep(30)
 
     @commands.command()
     async def githubinfo(self, ctx, *args):
