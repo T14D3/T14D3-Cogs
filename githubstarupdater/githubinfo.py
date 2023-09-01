@@ -1,24 +1,30 @@
 import discord
 from redbot.core import commands
-from github import Github
+from github import Github, GithubException
 
 class githubstarupdater(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def fetch_stars(self, repo_url, api_key):
-        # Initialize PyGithub with the access token
-        g = Github(api_key)
-        
-        repo_parts = repo_url.strip("/").split("/")
-        if len(repo_parts) == 2:
-            owner, repo_name = repo_parts
-            try:
-                repo = g.get_repo(f"{owner}/{repo_name}")
+        try:
+            # Initialize PyGithub with the access token
+            auth = Github(api_key)
+            
+            # Extract owner and repo name from the URL
+            parts = repo_url.strip("/").split("/")
+            if len(parts) >= 2:
+                owner = parts[-2]
+                repo_name = parts[-1]
+
+                repo = auth.get_repo(f"{owner}/{repo_name}")
                 stars = repo.stargazers_count
                 return stars
-            except Exception as e:
-                print(f"Failed to fetch stars: {e}")
+        except GithubException as e:
+            print(f"GitHub API error: {e}")
+        except Exception as e:
+            print(f"Failed to fetch stars: {e}")
+
         return None
 
     @commands.command()
