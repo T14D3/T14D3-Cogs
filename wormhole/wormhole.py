@@ -50,16 +50,6 @@ class WormHole(commands.Cog):
         else:
             await ctx.send("This channel is not part of the wormhole.")
     
-    @wormhole.command(name="setrank")
-    async def wormhole_set_rank(self, ctx, member: discord.Member, role_name: str):
-        """Set the displayed rank for a member in the guild."""
-        role = discord.utils.get(ctx.guild.roles, name=role_name)
-        if role:
-            await self.config.guild(ctx.guild).set_raw(f"member_{member.id}", value=role.id)
-            await ctx.send(f"The displayed rank for {member.display_name} has been set to {role_name}.")
-        else:
-            await ctx.send(f"Role '{role_name}' not found in the guild.")
-    
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         if not message.guild:  # don't allow in DMs
