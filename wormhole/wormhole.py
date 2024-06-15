@@ -77,15 +77,8 @@ class WormHole(commands.Cog):
                 if channel_id != message.channel.id:
                     channel = self.bot.get_channel(channel_id)
                     if channel:
-                        member = guild.get_member(author.id)
-                        if member:
-                            display_name = author.display_name if author.display_name else author.name
-                            rank_id = await self.config.guild(guild).get_raw(f"member_{author.id}")
-                            if rank_id:
-                                rank = guild.get_role(rank_id).name
-                            else:
-                                rank = member.top_role.name
-                            await channel.send(f"**{guild.name} - {rank} - {display_name}:** {message.content}")
+                        display_name = author.display_name if author.display_name else author.name
+                        await channel.send(f"**{guild.name} - {display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
