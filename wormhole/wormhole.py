@@ -15,10 +15,11 @@ class WormHole(commands.Cog):
     
     async def send_status_message(self, message, channel):
         linked_channels = await self.config.linked_channels_list()
+        guild = channel.guild
         for channel_id in linked_channels:
             relay_channel = self.bot.get_channel(channel_id)
             if relay_channel and relay_channel != channel:
-                await relay_channel.send(f"***The wormhole is shifting...** {message}*")
+                await relay_channel.send(f"***The wormhole is shifting...** {guild.name}: {message}*")
     
     @commands.group()
     async def wormhole(self, ctx):
@@ -32,7 +33,7 @@ class WormHole(commands.Cog):
         if ctx.channel.id not in linked_channels:
             linked_channels.append(ctx.channel.id)
             await self.config.linked_channels_list.set(linked_channels)
-            await ctx.send("This channel has joined the ever-changing maelstom that is the wormhole.")
+            await ctx.send("This channel has joined the ever-changing maelstrom that is the wormhole.")
             await self.send_status_message(f"A faint signal was picked up from {ctx.channel.mention}, connection has been established.", ctx.channel)
         else:
             await ctx.send("This channel is already part of the wormhole.")
@@ -59,12 +60,15 @@ class WormHole(commands.Cog):
             return  # Ignore bot commands
         
         linked_channels = await self.config.linked_channels_list()
+        guild = message.guild
+        author = message.author
         if message.channel.id in linked_channels:
             for channel_id in linked_channels:
                 if channel_id != message.channel.id:
                     channel = self.bot.get_channel(channel_id)
                     if channel:
-                        await channel.send(f"**{message.author.display_name}:** {message.content}")
+                        display_name = author.display_name if author.display_name else author.name
+                        await channel.send(f"**{guild.name} - {display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
