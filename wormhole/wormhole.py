@@ -50,6 +50,16 @@ class WormHole(commands.Cog):
         else:
             await ctx.send("This channel is not part of the wormhole.")
     
+    @wormhole.command(name="setrank")
+    async def wormhole_set_rank(self, ctx, member: discord.Member, role_name: str):
+        """Set the displayed rank for a member in the guild."""
+        role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if role:
+            await self.config.guild(ctx.guild).set_raw(f"member_{member.id}", value=role.id)
+            await ctx.send(f"The displayed rank for {member.display_name} has been set to {role_name}.")
+        else:
+            await ctx.send(f"Role '{role_name}' not found in the guild.")
+    
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         if not message.guild:  # don't allow in DMs
@@ -61,12 +71,21 @@ class WormHole(commands.Cog):
         
         linked_channels = await self.config.linked_channels_list()
         guild = message.guild
+        author = message.author
         if message.channel.id in linked_channels:
             for channel_id in linked_channels:
                 if channel_id != message.channel.id:
                     channel = self.bot.get_channel(channel_id)
                     if channel:
-                        await channel.send(f"**{guild.name} - {message.author.display_name}:** {message.content}")
+                        member = guild.get_member(author.id)
+                        if member:
+                            display_name = author.display_name if author.display_name else author.name
+                            rank_id = await self.config.guild(guild).get_raw(f"member_{author.id}")
+                            if rank_id:
+                                rank = guild.get_role(rank_id).name
+                            else:
+                                rank = member.top_role.name
+                            await channel.send(f"**{guild.name} - {rank} - {display_name}:** {message.content}")
     
 def setup(bot):
     bot.add_cog(WormHole(bot))
