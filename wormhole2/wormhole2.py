@@ -1,12 +1,16 @@
 import discord
 from redbot.core import commands, Config
-import aiohttp
 
 class WormHole2(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier="wormhole2", force_registration=True)
-        self.config.register_global(linked_channels_list=[])  # Initialize the configuration
+        self.config.register_global(
+            linked_channels_list=[],
+            use_webhooks=True,
+            image_mode="user",
+            name_mode="user"
+        )  # Initialize the configuration
         self.webhook_cache = {}
 
         self.bot.loop.create_task(self.setup_listeners())
@@ -27,7 +31,7 @@ class WormHole2(commands.Cog):
     async def wormhole2(self, ctx):
         """Manage wormhole connections."""
         pass
-    
+
     @wormhole2.command(name="open")
     async def wormhole_open(self, ctx):
         """Link the current channel to the network."""
@@ -52,6 +56,34 @@ class WormHole2(commands.Cog):
         else:
             await ctx.send("This channel is not part of the wormhole.")
     
+    @wormhole2.command(name="webhook")
+    @commands.has_permissions(administrator=True)
+    async def wormhole_webhook(self, ctx, toggle: bool):
+        """Enable or disable the use of webhooks."""
+        await self.config.use_webhooks.set(toggle)
+        status = "enabled" if toggle else "disabled"
+        await ctx.send(f"Webhooks have been {status} for WormHole2.")
+    
+    @wormhole2.command(name="image")
+    @commands.has_permissions(administrator=True)
+    async def wormhole_image(self, ctx, mode: str):
+        """Set the image mode for webhooks. Options: user, server"""
+        if mode in ["user", "server"]:
+            await self.config.image_mode.set(mode)
+            await ctx.send(f"Image mode set to {mode}.")
+        else:
+            await ctx.send("Invalid mode. Choose either 'user' or 'server'.")
+    
+    @wormhole2.command(name="name")
+    @commands.has_permissions(administrator=True)
+    async def wormhole_name(self, ctx, mode: str):
+        """Set the name mode for webhooks. Options: user, server, both"""
+        if mode in ["user", "server", "both"]:
+            await self.config.name_mode.set(mode)
+            await ctx.send(f"Name mode set to {mode}.")
+        else:
+            await ctx.send("Invalid mode. Choose either 'user', 'server', or 'both'.")
+
     async def get_webhook(self, channel):
         if channel.id in self.webhook_cache:
             return self.webhook_cache[channel.id]
@@ -75,16 +107,40 @@ class WormHole2(commands.Cog):
         
         linked_channels = await self.config.linked_channels_list()
         if message.channel.id in linked_channels:
-            for channel_id in linked_channels:
-                if channel_id != message.channel.id:
-                    relay_channel = self.bot.get_channel(channel_id)
-                    if relay_channel:
-                        webhook = await self.get_webhook(relay_channel)
-                        await webhook.send(
-                            content=message.content,
-                            username=message.author.display_name,
-                            avatar_url=message.author.avatar.url
-                        )
+            use_webhooks = await self.config.use_webhooks()
+            image_mode = await self.config.image_mode()
+            name_mode = await self.config.name_mode()
+            
+            if use_webhooks:
+                for channel_id in linked_channels:
+                    if channel_id != message.channel.id:
+                        relay_channel = self.bot.get_channel(channel_id)
+                        if relay_channel:
+                            webhook = await self.get_webhook(relay_channel)
+                            if image_mode == "user":
+                                avatar_url = message.author.avatar.url
+                            else:
+                                avatar_url = message.guild.icon.url if message.guild.icon else message.author.avatar.url
+
+                            if name_mode == "user":
+                                username = message.author.display_name
+                            elif name_mode == "server":
+                                username = message.guild.name
+                            else:
+                                username = f"{message.guild.name} - {message.author.display_name}"
+
+                            await webhook.send(
+                                content=message.content,
+                                username=username,
+                                avatar_url=avatar_url
+                            )
+            else:
+                for channel_id in linked_channels:
+                    if channel_id != message.channel.id:
+                        channel = self.bot.get_channel(channel_id)
+                        if channel:
+                            display_name = message.author.display_name if message.author.display_name else message.author.name
+                            await channel.send(f"**{message.guild.name} - {display_name}:** {message.content}")
 
 def setup(bot):
     bot.add_cog(WormHole2(bot))
