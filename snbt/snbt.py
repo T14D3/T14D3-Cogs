@@ -56,7 +56,7 @@ class SNBT(commands.Cog):
             await ctx.send("Result too long - sending as file:", 
                           file=discord.File(io.StringIO(snbt_result), "result.snbt"))
         else:
-            await ctx.send(f"```snbt\n{snbt_result}\n```")
+            await ctx.send(f"```hs\n{snbt_result}\n```")
 
     @snbt.command(name="tojson")
     @commands.bot_has_permissions(embed_links=True)
@@ -65,8 +65,8 @@ class SNBT(commands.Cog):
         Convert SNBT to JSON
         
         You can either:
-        - Paste SNBT in a code block (```snbt [...] ```)
-        - Attach a .snbt file
+        - Paste SNBT in a code block (```hs [...] ```)
+        - Attach a file
         """
         # Check for attachments first
         if ctx.message.attachments:
@@ -77,7 +77,7 @@ class SNBT(commands.Cog):
                 await ctx.send_help()
                 return
             # Clean code block formatting
-            snbt_text = re.sub(r'```(?:snbt)?\n?|\n?```', '', snbt_input).strip()
+            snbt_text = re.sub(r'```(?:hs)?\n?|\n?```', '', snbt_input).strip()
 
         try:
             json_result = self.snbt_to_json(snbt_text)
