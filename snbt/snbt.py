@@ -60,8 +60,9 @@ class SNBT(commands.Cog):
         num_single = s.count("'")
         num_double = s.count('"')
         if num_single <= num_double:
-            return f"'{s.replace("'", "\\'")}'"
-        return f'"{s.replace('"', '\\"')}"'
+            return "'" + s.replace("'", "\\'") + "'"
+        return '"' + s.replace('"', '\\"') + '"'
+
 
     def json_to_snbt(self, obj):
         """Recursive conversion with JSON-in-string detection"""
