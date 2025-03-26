@@ -1,0 +1,18 @@
+{
+    "author": [
+      "T14D3"
+    ],
+    "description": "Converts JSON to SNBT and vice versa.",
+    "hidden": false,
+    "install_msg": "SNBT converter installed!",
+    "short": "SNBT",
+    "end_user_data_statement": "This cog does not store end user data.",
+    "min_bot_version": "3.5.0",
+    "requirements": [
+        "json",
+        "re"
+    ],
+    "tags": [
+      "snbt", "tools", "utility"
+    ]
+  }
