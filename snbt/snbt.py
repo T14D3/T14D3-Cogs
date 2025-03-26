@@ -13,8 +13,7 @@ class SNBT(commands.Cog):
     @commands.group()
     async def snbt(self, ctx):
         """Base command for SNBT conversions"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help()
+        pass
 
     @snbt.command(name="fromjson")
     @commands.bot_has_permissions(embed_links=True)
